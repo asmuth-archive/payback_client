@@ -1,5 +1,6 @@
 require "rubygems"
 require 'nokogiri'
+require 'net/http'
 
 class PaybackClient
   
@@ -12,8 +13,7 @@ class PaybackClient
     @terminal_id = 12435
   end
   
-  def check_card_for_redemption(card_number)
-    
+  def check_card_for_redemption(card_number)    
     xml_request = build_xml_request_for_command(1, :CheckCardForRedemption, :cardnumber => card_number)
     puts xml_request
     
@@ -37,6 +37,10 @@ class PaybackClient
   end
   
 private
+
+  def send_xml_request_to_payback
+    
+  end
 
   def build_xml_request(request_id)
     builder = Nokogiri::XML::Builder.new(:encoding => "ISO-8859-1") do |xml|
