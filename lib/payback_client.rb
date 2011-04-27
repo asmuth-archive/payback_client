@@ -18,10 +18,7 @@ class PaybackClient
   end
   
   def check_card_for_redemption(card_number)    
-    xml_request = build_xml_request_with_command(1, :CheckCardForRedemption, :cardnumber => card_number) # FIXME request-id is always one   
-    xml_response = submit_xml_request(xml_request)
-    api_response = parse_xml_response(xml_response)
-  
+    api_response = build_and_submit_request_with_command(1, :CheckCardForRedemption, :cardnumber => card_number) # FIXME request-id is always one
     return {
       :balance => api_response['acctbalance'].to_i,
       :available => api_response['available'].to_i,
@@ -29,8 +26,16 @@ class PaybackClient
     }
   end
   
-  def authenticate_alternate_and_redeem(card_number, points_to_redeem, zip, dob)
-    raise "not implemented"
+  def authenticate_alternate_and_redeem(card_number, points_to_redeem, transaction_id, zip, dob)
+    # FIXME request-id is always one
+    api_response = build_and_submit_request_with_command(1, :AuthenticateAlternateAndRedeem, 
+      :cardnumber => card_number,
+      :points => points_to_redeem,
+      :terminalTransactionID => transaction_id,
+      :zip => zip,
+      :dob => dob
+    ) 
+    pp api_response
   end
     
   def authenticate_and_redeem(card_number, points_to_redeem, pin)
@@ -43,6 +48,12 @@ class PaybackClient
   
 private
 
+  def build_and_submit_request_with_command(request_id, command, data={})
+    xml_request = build_xml_request_with_command(request_id, command, data)    
+    xml_response = submit_xml_request(xml_request)
+    parse_xml_response(xml_response)
+  end
+
   def submit_xml_request(xml)
     uri = URI::parse(PAYBACK_SANDBOX_URL) # FIXME
     http = Net::HTTP.new(uri.host, uri.port)
@@ -54,13 +65,30 @@ private
   
   def parse_xml_response(xml)
     doc = Nokogiri::XML(xml)
+    check_error_code(doc)
     entries_as_hash = Hash.new
-    doc.xpath('//Response//DataRecord//Entry') .each do |entry|
+    doc.xpath('//Response//DataRecord//Entry').each do |entry|
       key = entry.xpath('Key').attribute('value').to_s
       value = entry.xpath('Value').attribute('value').to_s
       entries_as_hash[key] = value
     end
     return entries_as_hash
+  end
+  
+  def check_error_code(parsed_xml)
+    error_code = -1
+    error_code = parsed_xml.xpath('//Response/ErrorCode').attribute('value').to_s.to_i
+    if error_code == -202
+      raise PaybackClient::InternalErrorException
+    elsif error_code == -203
+      raise PaybackClient::InvalidException
+    elsif error_code == -204
+      raise PaybackClient::AuthenticationFailedException
+    elsif error_code == -216
+      raise PaybackClient::NotEnoughPointsException
+    elsif error_code < 0
+      raise PaybackClient::GenericException
+    end
   end
 
   def build_xml_request(request_id)
