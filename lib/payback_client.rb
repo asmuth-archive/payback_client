@@ -28,7 +28,7 @@ class PaybackClient
   
   def authenticate_alternate_and_redeem(card_number, points_to_redeem, transaction_id, zip, dob)
     # FIXME request-id is always one
-    api_response = build_and_submit_request_with_command(1, :AuthenticateAlternateAndRedeem, 
+    api_response = build_and_submit_request_with_command(1, :AuthenticateAlternateAndRedeemPoints, 
       :cardnumber => card_number,
       :points => points_to_redeem,
       :terminalTransactionID => transaction_id,
@@ -50,7 +50,9 @@ private
 
   def build_and_submit_request_with_command(request_id, command, data={})
     xml_request = build_xml_request_with_command(request_id, command, data)    
+    puts xml_request # FIXME remove me
     xml_response = submit_xml_request(xml_request)
+    puts xml_response # FIXME remove me
     parse_xml_response(xml_response)
   end
 
@@ -86,6 +88,10 @@ private
       raise PaybackClient::AuthenticationFailedException
     elsif error_code == -216
       raise PaybackClient::NotEnoughPointsException
+    elsif error_code == -224
+      raise PaybackClient::InvalidXMLException
+    elsif error_code == -287
+      raise PaybackClient::CardIsNotRegistered
     elsif error_code < 0
       raise PaybackClient::GenericException
     end
