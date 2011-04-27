@@ -20,7 +20,7 @@ class PaybackClient < PaybackClientExceptions
   
   def check_card_for_redemption(card_number)    
     verify_card_number!(card_number)
-    api_response = build_and_submit_request_with_command(1, :CheckCardForRedemption, :cardnumber => card_number) # FIXME request-id is always one
+    api_response = build_and_submit_request_with_command(:CheckCardForRedemption, :cardnumber => card_number) 
     return {
       :balance => api_response['acctbalance'].to_i,
       :available => api_response['available'].to_i,
@@ -30,8 +30,7 @@ class PaybackClient < PaybackClientExceptions
   
   def authenticate_alternate_and_redeem(card_number, points_to_redeem, transaction_id, zip, dob)
     verify_card_number!(card_number)
-    # FIXME request-id is always one
-    api_response = build_and_submit_request_with_command(1, :AuthenticateAlternateAndRedeemPoints, 
+    api_response = build_and_submit_request_with_command(:AuthenticateAlternateAndRedeemPoints, 
       :cardnumber => card_number,
       :points => points_to_redeem,
       :terminalTransactionID => transaction_id,
@@ -58,7 +57,8 @@ class PaybackClient < PaybackClientExceptions
   
 private
 
-  def build_and_submit_request_with_command(request_id, command, data={})
+  def build_and_submit_request_with_command(command, data={})
+    request_id = 1 #request_id is always one
     xml_request = build_xml_request_with_command(request_id, command, data)    
     puts xml_request # FIXME remove me
     xml_response = submit_xml_request(xml_request)

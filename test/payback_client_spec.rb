@@ -16,15 +16,15 @@ describe PaybackClient do
     points_on_card.should have_key(:available)
     points_on_card.should have_key(:available_for_next_redemption)
     points_on_card[:balance].should be_a(Integer)
-    points_on_card[:balance].should > 0
+    points_on_card[:balance].should >= 0
   end
   
-  it "should redeem 10 points and the current balance should change by 2 points" do
+  #if this test fails: maybe there are no more points left on our test-card?
+  it "should redeem 200 points correctly" do
     transaction_id = rand(99999)    
     points_on_card_before_redeem = @payback_client.check_card_for_redemption(@payback_card[:card_number])
     balance_before_redeem = points_on_card_before_redeem[:balance]    
     @payback_client.authenticate_alternate_and_redeem(@payback_card[:card_number], 200, transaction_id, @payback_card[:zip], @payback_card[:dob])    
-    raise "foo"
     points_on_card_after_redeem = @payback_client.check_card_for_redemption(@payback_card[:card_number])
     balance_after_redeem = points_on_card_after_redeem[:balance]    
     balance_after_redeem.should == balance_before_redeem - 2
