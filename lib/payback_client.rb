@@ -4,9 +4,12 @@ require 'net/http'
 require 'net/https'
 require 'uri'
 
-require 'pp' # FIXME remove me
+$: << File.dirname(__FILE__)
 
-class PaybackClient
+require 'pp' # FIXME remove me
+require 'payback_client_exceptions'
+
+class PaybackClient < PaybackClientExceptions
   
   PAYBACK_PRODUCTION_URL = "https://partner.payback.de:443/" #192.6.93.115
   PAYBACK_SANDBOX_URL = "http://pbltapp1.pbtst.lprz.com:80/" #192.56.25.167
@@ -18,7 +21,8 @@ class PaybackClient
   end
   
   def check_card_for_redemption(card_number)    
-    api_response = build_and_submit_request_with_command(1, :CheckCardForRedemption, :cardnumber => card_number) # FIXME request-id is always one
+    verify_card_number!(card_number)
+    api_response = build_and_submit_request_with_command(1, :CheckCardForRedemption, :card_number => card_number) # FIXME request-id is always one
     return {
       :balance => api_response['acctbalance'].to_i,
       :available => api_response['available'].to_i,
@@ -27,9 +31,10 @@ class PaybackClient
   end
   
   def authenticate_alternate_and_redeem(card_number, points_to_redeem, transaction_id, zip, dob)
+    verify_card_number!(card_number)
     # FIXME request-id is always one
     api_response = build_and_submit_request_with_command(1, :AuthenticateAlternateAndRedeemPoints, 
-      :cardnumber => card_number,
+      :card_number => card_number,
       :points => points_to_redeem,
       :terminalTransactionID => transaction_id,
       :zip => zip,
@@ -80,6 +85,7 @@ private
   def check_error_code(parsed_xml)
     error_code = -1
     error_code = parsed_xml.xpath('//Response/ErrorCode').attribute('value').to_s.to_i
+    puts error_code
     if error_code == -202
       raise PaybackClient::InternalErrorException
     elsif error_code == -203
@@ -123,6 +129,20 @@ private
         end
       end
     end
+  end
+
+  def verify_card_number!(card_number)
+    raise PaybackClient::InvalidCardException unless card_number_valid?(card_number)
+  end
+   
+ public
+  
+  def card_number_valid?(card_number) #calculate the luhn checksum
+    odd = true
+    card_number.to_s.gsub(/\D/,'').reverse.split('').map(&:to_i).collect { |d|
+      d *= 2 if odd = !odd
+      d > 9 ? d - 9 : d
+    }.reduce(0){ |sum,n| sum += n } % 10 == 0
   end
   
 end

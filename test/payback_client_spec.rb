@@ -33,4 +33,16 @@ describe PaybackClient do
     balance_after_redeem.should == balance_before_redeem - 2
   end
   
+  
+  it "should verify the card number" do
+    @payback_client.card_number_valid?(@payback_card[:card_number]).should be_true
+    @payback_client.card_number_valid?(@payback_card[:card_number][0..-3]+"123").should be_false
+  end
+  
+  it "should raise an exception if an invalid card number is passed into an api-call" do
+    lambda{
+      @payback_client.check_card_for_redemption(@payback_card[:card_number][0..-3]+"123")
+    }.should raise_error(PaybackClient::InvalidCardException)
+  end
+  
 end
