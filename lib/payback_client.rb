@@ -22,7 +22,7 @@ class PaybackClient < PaybackClientExceptions
   
   def check_card_for_redemption(card_number)    
     verify_card_number!(card_number)
-    api_response = build_and_submit_request_with_command(1, :CheckCardForRedemption, :card_number => card_number) # FIXME request-id is always one
+    api_response = build_and_submit_request_with_command(1, :CheckCardForRedemption, :cardnumber => card_number) # FIXME request-id is always one
     return {
       :balance => api_response['acctbalance'].to_i,
       :available => api_response['available'].to_i,
@@ -34,7 +34,7 @@ class PaybackClient < PaybackClientExceptions
     verify_card_number!(card_number)
     # FIXME request-id is always one
     api_response = build_and_submit_request_with_command(1, :AuthenticateAlternateAndRedeemPoints, 
-      :card_number => card_number,
+      :cardnumber => card_number,
       :points => points_to_redeem,
       :terminalTransactionID => transaction_id,
       :zip => zip,
