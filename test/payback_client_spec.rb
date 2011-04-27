@@ -20,19 +20,14 @@ describe PaybackClient do
   end
   
   it "should redeem 2 points and the current balance should change by 2 points" do
-    transaction_id = rand(99999999999)
-    
+    transaction_id = rand(99999999999)    
     points_on_card_before_redeem = @payback_client.check_card_for_redemption(@payback_card[:card_number])
-    balance_before_redeem = points_on_card_before_redeem[:balance]
-    
-    @payback_client.authenticate_alternate_and_redeem(@payback_card[:card_number], 2, transaction_id, @payback_card[:zip], @payback_card[:dob])
-    
+    balance_before_redeem = points_on_card_before_redeem[:balance]    
+    @payback_client.authenticate_alternate_and_redeem(@payback_card[:card_number], 2, transaction_id, @payback_card[:zip], @payback_card[:dob])    
     points_on_card_after_redeem = @payback_client.check_card_for_redemption(@payback_card[:card_number])
-    balance_after_redeem = points_on_card_after_redeem[:balance]
-    
+    balance_after_redeem = points_on_card_after_redeem[:balance]    
     balance_after_redeem.should == balance_before_redeem - 2
   end
-  
   
   it "should verify the card number" do
     @payback_client.card_number_valid?(@payback_card[:card_number]).should be_true
@@ -43,6 +38,20 @@ describe PaybackClient do
     lambda{
       @payback_client.check_card_for_redemption(@payback_card[:card_number][0..-3]+"123")
     }.should raise_error(PaybackClient::InvalidCardException)
+  end
+  
+  it "should raise an exception if an invalid zip code is passed into an api-call" do
+    transaction_id = rand(99999999999)    
+    lambda{
+      @payback_client.authenticate_alternate_and_redeem(@payback_card[:card_number], 2, transaction_id, "12345", @payback_card[:dob])
+    }.should raise_error(PaybackClient::AuthenticationFailedException)
+  end
+  
+  it "should raise an exception if an invalid date of birth is passed into api-call" do
+    transaction_id = rand(99999999999)    
+    lambda{
+      @payback_client.authenticate_alternate_and_redeem(@payback_card[:card_number], 2, transaction_id, @payback_card[:zip], "23.23.2323")
+    }.should raise_error(PaybackClient::AuthenticationFailedException)
   end
   
 end
