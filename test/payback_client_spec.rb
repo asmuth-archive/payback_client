@@ -19,4 +19,16 @@ describe PaybackClient do
     points_on_card[:balance].should > 0
   end
   
+  it "should redeem 2 points and the current balance should change by 2 points" do
+    points_on_card_before_redeem = @payback_client.check_card_for_redemption(@payback_card[:card_number])
+    balance_before_redeem = points_on_card_before_redeem[:balance]
+    
+    @payback_client.authenticate_alternate_and_redeem(@payback_card[:card_number], 2, @payback_card[:zip], @payback_card[:dob])
+    
+    points_on_card_after_redeem = @payback_client.check_card_for_redemption(@payback_card[:card_number])
+    balance_after_redeem = points_on_card_after_redeem[:balance]
+    
+    balance_after_redeem.should == balance_before_redeem - 2
+  end
+  
 end
