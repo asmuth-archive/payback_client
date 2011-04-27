@@ -16,7 +16,7 @@ describe PaybackClient do
     points_on_card.should have_key(:available)
     points_on_card.should have_key(:available_for_next_redemption)
     points_on_card[:balance].should be_a(Integer)
-    points_on_card[:balance].should == 12345
+    points_on_card[:balance].should > 0
   end
   
 end

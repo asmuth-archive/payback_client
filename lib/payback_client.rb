@@ -21,11 +21,11 @@ class PaybackClient
     xml_request = build_xml_request_with_command(1, :CheckCardForRedemption, :cardnumber => card_number) # FIXME request-id is always one   
     xml_response = submit_xml_request(xml_request)
     api_response = parse_xml_response(xml_response)
-    
+  
     return {
-      :balance => 12345,
-      :available => 12345,
-      :available_for_next_redemption => 12345
+      :balance => api_response['acctbalance'].to_i,
+      :available => api_response['available'].to_i,
+      :available_for_next_redemption => api_response['availableForNextRedemption'].to_i
     }
   end
   
@@ -54,8 +54,13 @@ private
   
   def parse_xml_response(xml)
     doc = Nokogiri::XML(xml)
-    puts xml
-    return doc
+    entries_as_hash = Hash.new
+    doc.xpath('//Response//DataRecord//Entry') .each do |entry|
+      key = entry.xpath('Key').attribute('value').to_s
+      value = entry.xpath('Value').attribute('value').to_s
+      entries_as_hash[key] = value
+    end
+    return entries_as_hash
   end
 
   def build_xml_request(request_id)
