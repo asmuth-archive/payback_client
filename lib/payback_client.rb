@@ -1,21 +1,26 @@
 require "rubygems"
 require 'nokogiri'
 require 'net/http'
+require 'net/https'
+require 'uri'
+
+require 'pp' # FIXME remove me
 
 class PaybackClient
   
   PAYBACK_PRODUCTION_URL = "https://partner.payback.de:443/" #192.6.93.115
-  PAYBACK_SANDBOX_URL = "http://pbltapp1.pbtst.lprz.com:6111/" #192.56.25.167
+  PAYBACK_SANDBOX_URL = "http://pbltapp1.pbtst.lprz.com:80/" #192.56.25.167
   
   def initialize(partner_id, branch_id)
     @partner_id = partner_id
     @branch_id = branch_id
-    @terminal_id = 12435
+    @terminal_id = @branch_id # FIXME where is the documentation for this?
   end
   
   def check_card_for_redemption(card_number)    
-    xml_request = build_xml_request_for_command(1, :CheckCardForRedemption, :cardnumber => card_number)
-    puts xml_request
+    xml_request = build_xml_request_with_command(1, :CheckCardForRedemption, :cardnumber => card_number) # FIXME request-id is always one   
+    xml_response = submit_xml_request(xml_request)
+    api_response = parse_xml_response(xml_response)
     
     return {
       :balance => 12345,
@@ -38,8 +43,19 @@ class PaybackClient
   
 private
 
-  def send_xml_request_to_payback
-    
+  def submit_xml_request(xml)
+    uri = URI::parse(PAYBACK_SANDBOX_URL) # FIXME
+    http = Net::HTTP.new(uri.host, uri.port)
+    http.use_ssl = true if uri.scheme == 'https'
+    resp, data = http.post('/pos/callCMD', xml, nil)
+    # FIXME error handling
+    return data
+  end
+  
+  def parse_xml_response(xml)
+    doc = Nokogiri::XML(xml)
+    puts xml
+    return doc
   end
 
   def build_xml_request(request_id)
@@ -56,7 +72,7 @@ private
     return builder.to_xml
   end
   
-  def build_xml_request_for_command(request_id, command, data={})
+  def build_xml_request_with_command(request_id, command, data={})
     build_xml_request(request_id) do |xml|
       xml.Command{ xml.Name(:value => command) }
       xml.DataRecord do
