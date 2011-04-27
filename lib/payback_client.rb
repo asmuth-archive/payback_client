@@ -5,8 +5,6 @@ require 'net/https'
 require 'uri'
 
 $: << File.dirname(__FILE__)
-
-require 'pp' # FIXME remove me
 require 'payback_client_exceptions'
 
 class PaybackClient < PaybackClientExceptions
@@ -40,7 +38,6 @@ class PaybackClient < PaybackClientExceptions
       :zip => zip,
       :dob => dob
     ) 
-    pp api_response
   end
     
   def authenticate_and_redeem(card_number, points_to_redeem, pin)
@@ -49,6 +46,14 @@ class PaybackClient < PaybackClientExceptions
   
   def auto_refund_points
     raise "not implemented"
+  end
+  
+  def card_number_valid?(card_number) #calculate the luhn checksum
+    odd = true
+    card_number.to_s.gsub(/\D/,'').reverse.split('').map(&:to_i).collect { |d|
+      d *= 2 if odd = !odd
+      d > 9 ? d - 9 : d
+    }.reduce(0){ |sum,n| sum += n } % 10 == 0
   end
   
 private
@@ -72,7 +77,7 @@ private
   
   def parse_xml_response(xml)
     doc = Nokogiri::XML(xml)
-    check_error_code(doc)
+    check_error_code!(doc)
     entries_as_hash = Hash.new
     doc.xpath('//Response//DataRecord//Entry').each do |entry|
       key = entry.xpath('Key').attribute('value').to_s
@@ -82,10 +87,9 @@ private
     return entries_as_hash
   end
   
-  def check_error_code(parsed_xml)
+  def check_error_code!(parsed_xml)
     error_code = -1
     error_code = parsed_xml.xpath('//Response/ErrorCode').attribute('value').to_s.to_i
-    puts error_code
     if error_code == -202
       raise PaybackClient::InternalErrorException
     elsif error_code == -203
@@ -103,6 +107,10 @@ private
     end
   end
 
+  def verify_card_number!(card_number)
+    raise PaybackClient::InvalidCardException unless card_number_valid?(card_number)
+  end
+  
   def build_xml_request(request_id)
     builder = Nokogiri::XML::Builder.new(:encoding => "ISO-8859-1") do |xml|
       xml.send(:"LMS-Service", "xmlns:xsi" => "http://www.w3.org/2001/XMLSchema-instance", "xsi:noNamespaceSchemaLocation" => "F:/R09006POS_Terminals/3-Design/LM-Service.xsd") do
@@ -131,18 +139,4 @@ private
     end
   end
 
-  def verify_card_number!(card_number)
-    raise PaybackClient::InvalidCardException unless card_number_valid?(card_number)
-  end
-   
- public
-  
-  def card_number_valid?(card_number) #calculate the luhn checksum
-    odd = true
-    card_number.to_s.gsub(/\D/,'').reverse.split('').map(&:to_i).collect { |d|
-      d *= 2 if odd = !odd
-      d > 9 ? d - 9 : d
-    }.reduce(0){ |sum,n| sum += n } % 10 == 0
-  end
-  
 end
