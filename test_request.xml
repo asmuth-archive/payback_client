@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <LMS-Service xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="F:/R09006POS_Terminals/3-Design/LM-Service.xsd">
   <PartnerID value="290"/>
-  <TerminalID value="00000100"/>
+  <TerminalID value="1"/>
   <Request>
     <RequestID value="1"/>
     <Command>
@@ -26,11 +26,7 @@
       </Entry>
       <Entry>
         <Key value="terminalTransactionID"/>
-        <Value value="123"/>
-      </Entry>
-      <Entry>
-        <Key value="branchnumber"/>
-        <Value value="1"/>
+        <Value value="142423"/>
       </Entry>
     </DataRecord>
   </Request>
