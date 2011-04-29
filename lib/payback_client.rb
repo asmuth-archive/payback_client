@@ -74,22 +74,24 @@ private
   end
   
   def parse_xml_response(xml)
-    doc = Nokogiri::XML(xml)
-    check_error_code!(doc)
-    entries_as_hash = Hash.new
-    doc.xpath('//Response//DataRecord//Entry').each do |entry|
-      key = entry.xpath('Key').attribute('value').to_s
-      value = entry.xpath('Value').attribute('value').to_s
-      entries_as_hash[key] = value
+    begin
+      doc = Nokogiri::XML(xml)
+      error_code = doc.xpath('//Response/ErrorCode').attribute('value').to_s.to_i
+      entries_as_hash = Hash.new
+      doc.xpath('//Response//DataRecord//Entry').each do |entry|
+        key = entry.xpath('Key').attribute('value').to_s
+        value = entry.xpath('Value').attribute('value').to_s
+        entries_as_hash[key] = value
+      end
+    rescue
+      raise PaybackClient::InvalidXMLException
+    else
+      check_error_code!(error_code)
+      return entries_as_hash
     end
-    return entries_as_hash
-  rescue
-    raise PaybackClient::InvalidXMLException
   end
   
-  def check_error_code!(parsed_xml)
-    error_code = -1
-    error_code = parsed_xml.xpath('//Response/ErrorCode').attribute('value').to_s.to_i
+  def check_error_code!(error_code)
     if error_code == -202
       raise PaybackClient::InternalErrorException
     elsif error_code == -203
