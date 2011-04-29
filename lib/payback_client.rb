@@ -11,6 +11,7 @@ class PaybackClient < PaybackClientExceptions
   
   PAYBACK_PRODUCTION_URL = "https://partner.payback.de:443/" #192.6.93.115
   PAYBACK_SANDBOX_URL = "http://pbltapp1.pbtst.lprz.com:80/" #192.56.25.167
+  PAYBACK_API_PATH = "/pos/callCMD"
   
   def initialize(partner_id, branch_id)
     @partner_id = partner_id
@@ -60,17 +61,15 @@ private
   def build_and_submit_request_with_command(command, data={})
     request_id = 1 #request_id is always one
     xml_request = build_xml_request_with_command(request_id, command, data)    
-    puts xml_request # FIXME remove me
     xml_response = submit_xml_request(xml_request)
-    puts xml_response # FIXME remove me
-    parse_xml_response(xml_response)
+    return parse_xml_response(xml_response)
   end
 
   def submit_xml_request(xml)
     uri = URI::parse(PAYBACK_SANDBOX_URL) # FIXME
     http = Net::HTTP.new(uri.host, uri.port)
     http.use_ssl = true if uri.scheme == 'https'
-    resp, data = http.post('/pos/callCMD', xml, nil)
+    resp, data = http.post(PAYBACK_API_PATH, xml, nil)
     # FIXME error handling
     return data
   end

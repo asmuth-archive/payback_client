@@ -1,5 +1,7 @@
-require 'test/payback_test_data'
-require 'lib/payback_client'
+$: << File.join(File.dirname(__FILE__), '..', 'lib')
+
+require 'spec/payback_test_data'
+require 'payback_client'
 
 describe PaybackClient do
   
@@ -8,15 +10,23 @@ describe PaybackClient do
     @payback_client = PaybackClient.new(PAYBACK_PARTNER_ID, PAYBACK_BRANCH_ID)
   end
   
-  it "should check the current balance" do
-    points_on_card = @payback_client.check_card_for_redemption(@payback_card[:card_number])
-    points_on_card.should be_a(Hash)
-    points_on_card.length.should == 3
-    points_on_card.should have_key(:balance)
-    points_on_card.should have_key(:available)
-    points_on_card.should have_key(:available_for_next_redemption)
-    points_on_card[:balance].should be_a(Integer)
-    points_on_card[:balance].should >= 0
+  describe "check the current balance" do
+    
+    before :each do
+      @points_on_card = @payback_client.check_card_for_redemption(@payback_card[:card_number])
+    end
+    
+    it "balance should be a hash with 3 keys" do      
+      @points_on_card.should be_a(Hash)
+      @points_on_card.length.should == 3
+      @points_on_card.keys.should include(:available, :available_for_next_redemption, :balance)
+    end
+    
+    it "balance should be an integer and greater than zero" do      
+      @points_on_card[:balance].should be_a(Integer)
+      @points_on_card[:balance].should >= 0
+    end
+    
   end
   
   #if this test fails: maybe there are no more points left on our test-card?
@@ -27,7 +37,7 @@ describe PaybackClient do
     @payback_client.authenticate_alternate_and_redeem(@payback_card[:card_number], 200, transaction_id, @payback_card[:zip], @payback_card[:dob])    
     points_on_card_after_redeem = @payback_client.check_card_for_redemption(@payback_card[:card_number])
     balance_after_redeem = points_on_card_after_redeem[:balance]    
-    balance_after_redeem.should == balance_before_redeem - 2
+    balance_after_redeem.should == balance_before_redeem - 200
   end
   
   it "should verify the card number" do
