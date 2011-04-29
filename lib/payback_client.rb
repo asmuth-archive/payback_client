@@ -11,7 +11,7 @@ class PaybackClient
   include PaybackClientExceptions
   
   def initialize(api_url, partner_id, branch_id)
-    @api_url = "http://pbltapp1.pbtst.lprz.com:80/pos/callCMD"
+    @api_url = api_url
     @partner_id = partner_id
     @branch_id = branch_id
     @terminal_id = @branch_id # FIXME where is the documentation for this?
@@ -59,11 +59,7 @@ private
   def build_and_submit_request_with_command(command, data={})
     request_id = 1 #request_id is always one
     xml_request = build_xml_request_with_command(request_id, command, data)    
-    begin
-      xml_response = submit_xml_request(xml_request)
-    rescue
-      raise PaybackClient::HTTPException
-    end
+    xml_response = submit_xml_request(xml_request)
     return parse_xml_response(xml_response)
   end
 
@@ -73,6 +69,8 @@ private
     http.use_ssl = true if uri.scheme == 'https'
     resp, data = http.post(uri.path, xml, nil)
     return data
+  rescue
+    raise PaybackClient::HTTPException
   end
   
   def parse_xml_response(xml)
@@ -85,6 +83,8 @@ private
       entries_as_hash[key] = value
     end
     return entries_as_hash
+  rescue
+    raise PaybackClient::InvalidXMLException
   end
   
   def check_error_code!(parsed_xml)
