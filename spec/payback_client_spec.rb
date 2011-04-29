@@ -7,7 +7,7 @@ describe PaybackClient do
   
   before :each do
     @payback_card = PAYBACK_TEST_CARDS[0]
-    @payback_client = PaybackClient.new(PAYBACK_PARTNER_ID, PAYBACK_BRANCH_ID)
+    @payback_client = PaybackClient.new(PAYBACK_SANDBOX_URL, PAYBACK_PARTNER_ID, PAYBACK_BRANCH_ID)
   end
   
   describe "check the current balance" do

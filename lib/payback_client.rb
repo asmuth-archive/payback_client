@@ -10,11 +10,8 @@ require 'payback_client_exceptions'
 class PaybackClient 
   include PaybackClientExceptions
   
-  PAYBACK_PRODUCTION_URL = "https://partner.payback.de:443/" #192.6.93.115
-  PAYBACK_SANDBOX_URL = "http://pbltapp1.pbtst.lprz.com:80/" #192.56.25.167
-  PAYBACK_API_PATH = "/pos/callCMD"
-  
-  def initialize(partner_id, branch_id)
+  def initialize(api_url, partner_id, branch_id)
+    @api_url = "http://pbltapp1.pbtst.lprz.com:80/pos/callCMD"
     @partner_id = partner_id
     @branch_id = branch_id
     @terminal_id = @branch_id # FIXME where is the documentation for this?
@@ -62,16 +59,19 @@ private
   def build_and_submit_request_with_command(command, data={})
     request_id = 1 #request_id is always one
     xml_request = build_xml_request_with_command(request_id, command, data)    
-    xml_response = submit_xml_request(xml_request)
+    begin
+      xml_response = submit_xml_request(xml_request)
+    rescue
+      raise PaybackClient::HTTPException
+    end
     return parse_xml_response(xml_response)
   end
 
   def submit_xml_request(xml)
-    uri = URI::parse(PAYBACK_SANDBOX_URL) # FIXME
+    uri = URI::parse(@api_url) 
     http = Net::HTTP.new(uri.host, uri.port)
     http.use_ssl = true if uri.scheme == 'https'
-    resp, data = http.post(PAYBACK_API_PATH, xml, nil)
-    # FIXME error handling
+    resp, data = http.post(uri.path, xml, nil)
     return data
   end
   
@@ -101,7 +101,7 @@ private
     elsif error_code == -224
       raise PaybackClient::InvalidXMLException
     elsif error_code == -287
-      raise PaybackClient::CardIsNotRegistered
+      raise PaybackClient::CardIsNotRegisteredException
     elsif error_code < 0
       raise PaybackClient::GenericException
     end

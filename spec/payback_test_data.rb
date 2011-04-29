@@ -1,3 +1,4 @@
+PAYBACK_SANDBOX_URL = "http://pbltapp1.pbtst.lprz.com:80/pos/callCMD" #192.56.25.167
 PAYBACK_PARTNER_ID = 290 #assigned to betterplace.org
 PAYBACK_BRANCH_ID = "00000100" #dummy branch id
 PAYBACK_TEST_CARDS = [{

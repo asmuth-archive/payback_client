@@ -5,6 +5,7 @@ module PaybackClientExceptions
   class AuthenticationFailedException < StandardError; end
   class NotEnoughPointsException < StandardError; end
   class InvalidXMLException < StandardError; end
-  class CardIsNotRegistered < StandardError; end
+  class CardIsNotRegisteredException < StandardError; end
+  class HTTPException < StandardError; end
 end
 
