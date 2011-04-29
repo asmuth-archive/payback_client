@@ -28,8 +28,8 @@ Jeweler::RubygemsDotOrgTasks.new
 
 require 'rcov/rcovtask'
 Rcov::RcovTask.new do |test|
-  test.libs << 'test'
-  test.pattern = 'test/**/test_*.rb'
+  test.libs << 'rspec'
+  test.pattern = 'spec/*_spec.rb'
   test.verbose = true
 end
 
