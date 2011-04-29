@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{payback_client}
-  s.version = "0.0.0"
+  s.version = "0.0.1"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["paulasmuth"]
-  s.date = %q{2011-04-28}
+  s.date = %q{2011-04-29}
   s.description = %q{TODO: longer description of your gem}
   s.email = %q{paul@23loc.com}
   s.extra_rdoc_files = [
@@ -26,10 +26,9 @@ Gem::Specification.new do |s|
     "VERSION",
     "lib/payback_client.rb",
     "lib/payback_client_exceptions.rb",
-    "send_test_request.sh",
-    "test/payback_client_spec.rb",
-    "test/payback_test_data.rb",
-    "test_request.xml"
+    "payback_client.gemspec",
+    "spec/payback_client_spec.rb",
+    "spec/payback_test_data.rb"
   ]
   s.homepage = %q{http://github.com/paulasmuth/payback_client}
   s.licenses = ["MIT"]
@@ -37,8 +36,8 @@ Gem::Specification.new do |s|
   s.rubygems_version = %q{1.6.2}
   s.summary = %q{TODO: one-line summary of your gem}
   s.test_files = [
-    "test/payback_client_spec.rb",
-    "test/payback_test_data.rb"
+    "spec/payback_client_spec.rb",
+    "spec/payback_test_data.rb"
   ]
 
   if s.respond_to? :specification_version then
@@ -50,12 +49,14 @@ Gem::Specification.new do |s|
       s.add_development_dependency(%q<bundler>, ["~> 1.0.0"])
       s.add_development_dependency(%q<jeweler>, ["~> 1.5.2"])
       s.add_development_dependency(%q<rcov>, [">= 0"])
+      s.add_development_dependency(%q<rspec>, ["~> 1.3.1"])
     else
       s.add_dependency(%q<nokogiri>, [">= 0"])
       s.add_dependency(%q<shoulda>, [">= 0"])
       s.add_dependency(%q<bundler>, ["~> 1.0.0"])
       s.add_dependency(%q<jeweler>, ["~> 1.5.2"])
       s.add_dependency(%q<rcov>, [">= 0"])
+      s.add_dependency(%q<rspec>, ["~> 1.3.1"])
     end
   else
     s.add_dependency(%q<nokogiri>, [">= 0"])
@@ -63,6 +64,7 @@ Gem::Specification.new do |s|
     s.add_dependency(%q<bundler>, ["~> 1.0.0"])
     s.add_dependency(%q<jeweler>, ["~> 1.5.2"])
     s.add_dependency(%q<rcov>, [">= 0"])
+    s.add_dependency(%q<rspec>, ["~> 1.3.1"])
   end
 end
 
