@@ -7,7 +7,8 @@ require 'uri'
 $: << File.dirname(__FILE__)
 require 'payback_client_exceptions'
 
-class PaybackClient < PaybackClientExceptions
+class PaybackClient 
+  include PaybackClientExceptions
   
   PAYBACK_PRODUCTION_URL = "https://partner.payback.de:443/" #192.6.93.115
   PAYBACK_SANDBOX_URL = "http://pbltapp1.pbtst.lprz.com:80/" #192.56.25.167

@@ -1,4 +1,4 @@
-class PaybackClientExceptions
+module PaybackClientExceptions
   class InvalidCardException < StandardError; end
   class InternalErrorException < StandardError; end
   class GenericException < StandardError; end
