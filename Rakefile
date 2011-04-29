@@ -15,8 +15,8 @@ Jeweler::Tasks.new do |gem|
   gem.name = "payback_client"
   gem.homepage = "http://github.com/paulasmuth/payback_client"
   gem.license = "MIT"
-  gem.summary = %Q{TODO: one-line summary of your gem}
-  gem.description = %Q{TODO: longer description of your gem}
+  gem.summary = "payback instore redemption api client"
+  gem.description = "a ruby client for loyalty partners xml-based payback instore redemption api"
   gem.email = "paul@23loc.com"
   gem.authors = ["paulasmuth"]
   # Include your dependencies below. Runtime dependencies are required when using your gem,

@@ -5,12 +5,12 @@
 
 Gem::Specification.new do |s|
   s.name = %q{payback_client}
-  s.version = "0.0.1"
+  s.version = "0.0.2"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["paulasmuth"]
   s.date = %q{2011-04-29}
-  s.description = %q{TODO: longer description of your gem}
+  s.description = %q{a ruby client for loyalty partners xml-based payback instore redemption api}
   s.email = %q{paul@23loc.com}
   s.extra_rdoc_files = [
     "LICENSE.txt",
@@ -34,7 +34,7 @@ Gem::Specification.new do |s|
   s.licenses = ["MIT"]
   s.require_paths = ["lib"]
   s.rubygems_version = %q{1.6.2}
-  s.summary = %q{TODO: one-line summary of your gem}
+  s.summary = %q{payback instore redemption api client}
   s.test_files = [
     "spec/payback_client_spec.rb",
     "spec/payback_test_data.rb"
