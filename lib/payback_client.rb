@@ -14,7 +14,7 @@ class PaybackClient
     @api_url = api_url
     @partner_id = partner_id
     @branch_id = branch_id
-    @terminal_id = @branch_id # FIXME where is the documentation for this?
+    @terminal_id = @branch_id # the documentation for this is nowhere to be found, but it works...
   end
   
   def check_card_for_redemption(card_number)    
@@ -84,7 +84,7 @@ private
         entries_as_hash[key] = value
       end
     rescue
-      raise PaybackClient::InvalidXMLException
+      raise PaybackClient::InvalidXMLException, xml
     else
       check_error_code!(error_code)
       return entries_as_hash
