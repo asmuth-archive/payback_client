@@ -1,4 +1,4 @@
-=testing payback_client
+=payback_client
 
-add this line to your /etc/hosts
-  192.56.25.167 pbltapp1.pbtst.lprz.com 
+client for the payback in-store redemption api
+

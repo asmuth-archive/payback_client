@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{payback_client}
-  s.version = "0.0.3"
+  s.version = "0.0.4"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["paulasmuth"]
-  s.date = %q{2011-04-29}
+  s.date = %q{2011-05-04}
   s.description = %q{a ruby client for loyalty partners xml-based payback instore redemption api}
   s.email = %q{paul@23loc.com}
   s.extra_rdoc_files = [
@@ -24,6 +24,7 @@ Gem::Specification.new do |s|
     "README.rdoc",
     "Rakefile",
     "VERSION",
+    "doc/Instore_Product_Reward.pdf",
     "lib/payback_client.rb",
     "lib/payback_client_exceptions.rb",
     "payback_client.gemspec",
